@@ -1,5 +1,7 @@
 /* your css code */
-
 .mySvg{
   background: red;
+}
+.land{
+  fill: blue;
 }
