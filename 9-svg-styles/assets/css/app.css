@@ -3,3 +3,8 @@
 .mySvg{
   background: red;
 }
+.pumpkin {
+  fill: yellow;
+  stroke: black;
+  stroke-width: 20;
+}
