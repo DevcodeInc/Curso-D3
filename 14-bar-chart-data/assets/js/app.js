@@ -8,7 +8,6 @@
     fetch(URL)
     .then((response) => response.json())
     .then((data) => {
-      console.log(data);
       const dataset = data
       .filter(item => item.year <= 1990)
       .map((item)=> {
