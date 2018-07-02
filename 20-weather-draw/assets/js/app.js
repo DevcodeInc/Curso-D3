@@ -5,24 +5,24 @@
   document.addEventListener("DOMContentLoaded", (event) => {
     d3.csv(URL, (item) => item)
     .then((data) => {
-      const cities = data.columns.slice(1).map(key => {
+      const cities = data.columns.slice(1).map((key) => {
         return {
           name: key,
-          values: data.map(row => {
+          values: data.map(item => {
             return {
-              name: new Date(row.date.split('-')),
-              value: row[key]
+              name: new Date(item.date.split('-')),
+              value: item[key]
             }
           })
-        };
+        }
       });
-
       const dates = data.map(item => new Date(item.date.split('-')));
       drawChart(cities, dates);
     });
   });
 
   function drawChart(cities, dates){
+    console.log(cities);
     const svgWidth = 800;
     const svgHeight = 500;
     const margin = { top: 10, left: 50, right: 100, bottom: 10 };
@@ -34,17 +34,19 @@
     .attr('height', svgHeight);
 
     const g = svg.append('g')
-      .attr('transform', `translate(${margin.left}, ${margin.top})`);
+    .attr('transform', `translate(${margin.left}, ${margin.top})`);
 
     const xScale = d3.scaleTime()
       .domain(d3.extent(dates))
       .rangeRound([0, width]);
 
+    const yDomain = [
+      d3.min(cities, (city) => d3.min(city.values, (item) => item.value )),
+      d3.max(cities, (city) => d3.max(city.values, (item) => item.value ))
+    ];
+
     const yScale = d3.scaleLinear()
-      .domain([
-        d3.min(cities, (city) => d3.min(city.values, (item) => item.value )),
-        d3.max(cities, (city) => d3.max(city.values, (item) => item.value ))
-      ])
+      .domain(yDomain)
       .rangeRound([height - 10, 0]);
 
     const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
@@ -53,21 +55,19 @@
       .x(item => xScale(item.name))
       .y(item => yScale(item.value));
 
-    const body = d3.select('body');
-
     g.append('g')
       .attr('transform', `translate(0, ${height - margin.top})`)
       .call(d3.axisBottom(xScale));
-    
+
     g.append('g')
       .call(d3.axisLeft(yScale));
 
-    const city = g.selectAll(".city")
+    const groups = g.selectAll('g.city')
       .data(cities)
       .enter()
-      .append("g");
+      .append('g');
 
-    const path = city.append('path')
+    groups.append('path')
       .attr('fill', 'none')
       .attr('stroke-linejoin', 'miter')
       .attr('stroke-linecap', 'miter')
@@ -75,26 +75,7 @@
       .attr('stroke', (item) => colorScale(item.name))
       .attr('d', (item) => line(item.values));
 
-    const nodes = path.nodes();
-
-    path
-      .attr("stroke-dasharray", (item , index) => {
-        const totalLength = nodes[index].getTotalLength();
-        return `${totalLength} ${totalLength}`;
-      })
-      .attr("stroke-dashoffset", (item , index) => {
-        const totalLength = nodes[index].getTotalLength();
-        return `${totalLength}`;
-      })
-      .transition()
-      .duration(2000)
-      .attr("stroke-dashoffset", 0);
-
-    function calc(path) {
-      console.log(path);
-    }
-
-    city.append("text")
+      groups.append('text')
       .datum((item) => {
         return {
           name: item.name,
@@ -109,7 +90,6 @@
       .text(data => {
         return data.name;
       });
-
   }
 
 })();
