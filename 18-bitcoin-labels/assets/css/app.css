@@ -1,0 +1,18 @@
+/* your css code */
+svg text{
+  font-size: .7rem;
+}
+svg .dot{
+  cursor: pointer;
+}
+div.label{
+  position: absolute;
+  background-color: black;
+  color: white;
+  padding: 5px;
+  border-radius: 5px;
+  opacity: 0;
+}
+div.label strong {
+  color: white;
+}
